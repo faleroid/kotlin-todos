@@ -7,7 +7,7 @@ import com.pemmob.todoapp.data.repository.TodoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 enum class TodoFilter { ALL, ACTIVE, COMPLETED }
@@ -19,20 +19,21 @@ class HomeViewModel(
     private val _filter = MutableStateFlow(TodoFilter.ALL)
     val filter: StateFlow<TodoFilter> = _filter
 
-    val uiState: StateFlow<TodoUiState> = repository.todos
-        .map { todos ->
-            val filtered = when (_filter.value) {
-                TodoFilter.ALL -> todos
-                TodoFilter.ACTIVE -> todos.filterNot { it.isDone }
-                TodoFilter.COMPLETED -> todos.filter { it.isDone }
-            }
-            TodoUiState.Success(filtered) as TodoUiState
+    val uiState: StateFlow<TodoUiState> = combine(
+        repository.todos,
+        _filter
+    ) { todos, currentFilter ->
+        val filtered = when (currentFilter) {
+            TodoFilter.ALL -> todos
+            TodoFilter.ACTIVE -> todos.filterNot { it.isDone }
+            TodoFilter.COMPLETED -> todos.filter { it.isDone }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = TodoUiState.Loading
-        )
+        TodoUiState.Success(filtered)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = TodoUiState.Loading
+    )
 
     fun onToggleDone(id: String) {
         repository.toggleDone(id)
