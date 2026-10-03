@@ -6,6 +6,9 @@ data class Todo(
     val id: String = UUID.randomUUID().toString(),
     val title: String,
     val description: String = "",
+    val location: String = "",
+    val dueFrom: String = "",
+    val dueTo: String = "",
     val isDone: Boolean = false,
     val priority: Priority = Priority.MEDIUM
 )

@@ -2,6 +2,7 @@ package com.pemmob.todoapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pemmob.todoapp.data.model.Priority
 import com.pemmob.todoapp.data.model.Todo
 import com.pemmob.todoapp.data.repository.TodoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,5 +45,25 @@ class HomeViewModel(
 
     fun onFilterChange(newFilter: TodoFilter) {
         _filter.value = newFilter
+    }
+
+    fun addTodo(
+        title: String,
+        description: String,
+        location: String,
+        dueFrom: String,
+        dueTo: String,
+        priority: Priority
+    ) {
+        repository.addTodo(
+            Todo(
+                title = title,
+                description = description,
+                location = location,
+                dueFrom = dueFrom,
+                dueTo = dueTo,
+                priority = priority
+            )
+        )
     }
 }
