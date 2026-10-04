@@ -54,5 +54,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.compose.ui:ui-text-google-fonts")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }
