@@ -26,15 +26,24 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pemmob.todoapp.ui.ViewModelFactory
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.pemmob.todoapp.data.model.Todo
+import com.pemmob.todoapp.ui.edit.EditTodoBottomSheet
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onAddClick: () -> Unit,
-    onTodoClick: (String) -> Unit,
+    onTodoClick: (String) -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = ViewModelFactory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val currentFilter by viewModel.filter.collectAsState()
+
+    // state untuk menyimpan todo yang sedang diedit
+    var selectedTodoForEdit by remember { mutableStateOf<Todo?>(null) }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Todo List") }) },
@@ -84,7 +93,10 @@ fun HomeScreen(
                                 TodoItemCard(
                                     todo = todo,
                                     onToggleDone = { viewModel.onToggleDone(todo.id) },
-                                    onClick = { onTodoClick(todo.id) }
+                                    onClick = {
+                                        selectedTodoForEdit = todo
+                                        onTodoClick(todo.id)
+                                    }
                                 )
                             }
                         }
@@ -92,5 +104,16 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    // modal edit ditampilin di sini karena halaman detail todo belum ada
+    selectedTodoForEdit?.let { todoToEdit ->
+        EditTodoBottomSheet(
+            todo = todoToEdit,
+            onDismissRequest = { selectedTodoForEdit = null },
+            onUpdateTask = { updated ->
+                viewModel.updateTodo(updated)
+            }
+        )
     }
 }

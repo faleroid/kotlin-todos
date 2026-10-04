@@ -66,4 +66,8 @@ class HomeViewModel(
             )
         )
     }
+
+    fun updateTodo(updatedTodo: Todo) {
+        repository.updateTodo(updatedTodo)
+    }
 }
