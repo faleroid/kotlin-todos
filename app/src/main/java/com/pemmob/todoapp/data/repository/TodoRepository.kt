@@ -7,13 +7,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class TodoRepository {
-    private val _todos = MutableStateFlow(
+    private val _todos = MutableStateFlow<List<Todo>>(
         listOf(
             Todo(title = "Belajar Jetpack Compose", description = "Fokus ke State & UDF", priority = Priority.HIGH),
             Todo(title = "Kerjain tugas MVVM", description = "Buat ViewModel + UiState"),
             Todo(title = "Push ke GitHub", isDone = true)
         )
     )
+
     val todos: StateFlow<List<Todo>> = _todos.asStateFlow()
 
     fun addTodo(todo: Todo) {
