@@ -21,8 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,7 +29,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -52,6 +48,12 @@ import androidx.compose.ui.unit.sp
 import com.pemmob.todoapp.data.model.Todo
 import com.pemmob.todoapp.ui.TodoUiState
 import com.pemmob.todoapp.ui.TodoViewModel
+import com.pemmob.todoapp.ui.theme.AppBackground
+import com.pemmob.todoapp.ui.theme.GreenNormal
+import com.pemmob.todoapp.ui.theme.TextPrimary
+import com.pemmob.todoapp.ui.theme.TextSecondary
+import com.pemmob.todoapp.ui.theme.Transparent
+import com.pemmob.todoapp.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,15 +69,15 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToAdd,
-                containerColor = Color(0xFF55C500),
-                contentColor = Color.White,
+                containerColor = GreenNormal,
+                contentColor = White,
                 shape = CircleShape,
                 modifier = Modifier.size(64.dp)
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Todo", modifier = Modifier.size(32.dp))
             }
         },
-        containerColor = Color(0xFFF3F4F6)
+        containerColor = AppBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -87,21 +89,9 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(text = "Good morning!", fontSize = 14.sp, color = Color.Gray)
-                    Text(text = "Alexandra", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                }
-                Row {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Filled.Notifications, contentDescription = "Notifications")
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
-                    }
-                }
+                Text(text = "Ciao, Alexandra!", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
 
             // Filters
@@ -117,8 +107,15 @@ fun HomeScreen(
                         onClick = { selectedFilter = filter },
                         label = { Text(filter) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFF55C500),
-                            selectedLabelColor = Color.White
+                            selectedContainerColor = GreenNormal,
+                            selectedLabelColor = White,
+                            containerColor = White,
+                            labelColor = GreenNormal
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = selectedFilter == filter,
+                            borderColor = GreenNormal
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -129,7 +126,7 @@ fun HomeScreen(
             when (uiState) {
                 is TodoUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color(0xFF55C500))
+                        CircularProgressIndicator(color = GreenNormal)
                     }
                 }
                 is TodoUiState.Error -> {
@@ -165,7 +162,7 @@ fun TodoItemCard(todo: Todo, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -173,13 +170,13 @@ fun TodoItemCard(todo: Todo, onClick: () -> Unit) {
                 text = todo.title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.Black
+                color = TextPrimary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = todo.description,
-                fontSize = 12.sp,
-                color = Color.Gray,
+                fontSize = 14.sp,
+                color = TextSecondary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -192,18 +189,18 @@ fun TodoItemCard(todo: Todo, onClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color.Transparent)
+                        .background(Transparent)
                         .padding(horizontal = 0.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = todo.date,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = TextSecondary
                     )
                 }
 
-                val statusText = if (todo.isCompleted) "Completed" else "To do"
-                val statusColor = Color(0xFF55C500)
+                val statusText = if (todo.isCompleted) "Completed" else "See Detail"
+                val statusColor = GreenNormal
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
@@ -213,7 +210,7 @@ fun TodoItemCard(todo: Todo, onClick: () -> Unit) {
                     Text(
                         text = statusText,
                         fontSize = 12.sp,
-                        color = Color.White,
+                        color = White,
                         fontWeight = FontWeight.Medium
                     )
                 }

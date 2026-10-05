@@ -39,11 +39,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pemmob.todoapp.ui.TodoViewModel
+import com.pemmob.todoapp.ui.theme.AmberNormal
+import com.pemmob.todoapp.ui.theme.AppBackground
+import com.pemmob.todoapp.ui.theme.GreenDark
+import com.pemmob.todoapp.ui.theme.GreenDarker
+import com.pemmob.todoapp.ui.theme.GreenNormal
+import com.pemmob.todoapp.ui.theme.Neutral
+import com.pemmob.todoapp.ui.theme.TextPrimary
+import com.pemmob.todoapp.ui.theme.TextSecondary
+import com.pemmob.todoapp.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,22 +72,22 @@ fun TodoDetailScreen(
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF3F4F6))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppBackground)
             )
         },
         floatingActionButton = {
             if (todo != null) {
                 FloatingActionButton(
                     onClick = { onNavigateToEdit(todo!!.id) },
-                    containerColor = Color(0xFF55C500),
-                    contentColor = Color.White,
+                    containerColor = GreenNormal,
+                    contentColor = White,
                     shape = CircleShape
                 ) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit Todo")
                 }
             }
         },
-        containerColor = Color(0xFFF3F4F6)
+        containerColor = AppBackground
     ) { innerPadding ->
         if (todo != null) {
             val currentTodo = todo!!
@@ -91,7 +99,7 @@ fun TodoDetailScreen(
             ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = White),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -100,7 +108,7 @@ fun TodoDetailScreen(
                             horizontalArrangement = Arrangement.End
                         ) {
                             // Priority Badge
-                            val priorityColor = Color(0xFFFFB703) // Medium color for example
+                            val priorityColor = AmberNormal
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(16.dp))
@@ -117,7 +125,7 @@ fun TodoDetailScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             // Status Badge
                             val statusText = if (currentTodo.isCompleted) "Completed" else "In Progres"
-                            val statusColor = Color(0xFF55C500)
+                            val statusColor = GreenNormal
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(16.dp))
@@ -127,7 +135,7 @@ fun TodoDetailScreen(
                                 Text(
                                     text = statusText,
                                     fontSize = 12.sp,
-                                    color = Color.White,
+                                    color = White,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
@@ -139,13 +147,13 @@ fun TodoDetailScreen(
                             text = currentTodo.title,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = TextPrimary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = currentTodo.description,
                             fontSize = 14.sp,
-                            color = Color.DarkGray
+                            color = TextSecondary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -154,13 +162,13 @@ fun TodoDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(Color(0xFFF3F4F6))
+                                .background(AppBackground)
                                 .padding(12.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Done, contentDescription = "Date", tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Filled.Done, contentDescription = "Date", tint = Neutral, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = currentTodo.date, fontSize = 14.sp, color = Color.DarkGray)
+                                Text(text = currentTodo.date, fontSize = 14.sp, color = TextSecondary)
                             }
                         }
                     }
@@ -169,31 +177,32 @@ fun TodoDetailScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // Actions (Complete / Delete)
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
                         onClick = { viewModel.toggleTodoCompletion(currentTodo.id) },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = if (currentTodo.isCompleted) Color.Gray else Color(0xFF55C500)),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = if (currentTodo.isCompleted) Neutral else GreenNormal),
                         shape = RoundedCornerShape(25.dp)
                     ) {
+                        Icon(Icons.Filled.Done, contentDescription = "Complete", tint= GreenDarker)
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(if (currentTodo.isCompleted) "Mark as Uncompleted" else "Mark as Completed")
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = {
                             viewModel.deleteTodo(currentTodo.id)
                             onNavigateBack()
                         },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                         shape = RoundedCornerShape(25.dp)
                     ) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                        Icon(Icons.Filled.Delete, contentDescription = "Delete", tint=White)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Delete")
+                        Text("Delete", color=White)
                     }
                 }
             }
