@@ -4,63 +4,70 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.pemmob.todoapp.ui.DetailTugas.DetailTugasScreen
+import com.pemmob.todoapp.data.repository.InMemoryTodoRepository
+import com.pemmob.todoapp.ui.TodoViewModel
+import com.pemmob.todoapp.ui.addedit.AddEditTodoScreen
+import com.pemmob.todoapp.ui.detail.TodoDetailScreen
 import com.pemmob.todoapp.ui.home.HomeScreen
 import com.pemmob.todoapp.ui.theme.ToDoAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val repository = InMemoryTodoRepository()
+        
         enableEdgeToEdge()
         setContent {
             ToDoAppTheme {
+                val viewModel: TodoViewModel = viewModel(factory = TodoViewModel.provideFactory(repository))
                 val navController = rememberNavController()
+                
                 NavHost(navController = navController, startDestination = "Home") {
                     composable(route = "Home") {
                         HomeScreen(
-                            // Berpindah ke layar tambah tugas (jika nanti ada)
-                            onAddClick = { /* navController.navigate("add_tugas") */ },
-                            // Berpindah ke layar detail dengan membawa ID tugas
-                            onTodoClick = { tugasId -> navController.navigate("detail/$tugasId") }
+                            viewModel = viewModel,
+                            onNavigateToAdd = { navController.navigate("add_edit") },
+                            onNavigateToDetail = { todoId -> navController.navigate("detail/$todoId") }
                         )
                     }
-
-//                    composable(route = "Home") {
-//                        HomeScreen(
-//                            navController = navController,
-//                            viewModel = HomeScreen()
-//                        )
-//                    }
+                    
                     composable(
-                        route = "detail/{tugasId}", // ❌ Seharusnya 'tugasId', bukan 'productId'
-                        arguments = listOf(navArgument(name = "productId") { // ❌ ERROR: navArgument belum di-import
-                            type = NavType.IntType // ❌ ERROR: NavType belum di-import
+                        route = "add_edit?todoId={todoId}",
+                        arguments = listOf(navArgument(name = "todoId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
                         })
                     ) { backStackEntry ->
-                        val tugasId = backStackEntry.arguments?.getInt("tugasId") ?: 0
-                        DetailTugasScreen( // ❌ ERROR: File ini tidak ada, harusnya 'DetailTugasScreen'
-                            tugasId = tugasId,
-                            )
+                        val todoId = backStackEntry.arguments?.getString("todoId")
+                        AddEditTodoScreen(
+                            todoId = todoId,
+                            viewModel = viewModel,
+                            onNavigateBack = { navController.popBackStack() }
+                        )
                     }
-
-//                    composable(
-//                        route = "detail/{productId}",
-//                        arguments = listOf(navArgument(name = "productId") {
-//                            type = NavType.IntType
-//                        })
-//                    ) { backStackEntry ->
-//                        val productId = backStackEntry.arguments?.getInt("productId") ?: 0
-//                        DetailProductScreen(
-//                            productId = productId,
-//                            navController = navController,
-//                            viewModel = productViewModel
-//                        )
-//                    }
+                    
+                    composable(
+                        route = "detail/{todoId}",
+                        arguments = listOf(navArgument(name = "todoId") {
+                            type = NavType.StringType
+                        })
+                    ) { backStackEntry ->
+                        val todoId = backStackEntry.arguments?.getString("todoId") ?: ""
+                        TodoDetailScreen(
+                            todoId = todoId,
+                            viewModel = viewModel,
+                            onNavigateBack = { navController.popBackStack() },
+                            onNavigateToEdit = { id -> navController.navigate("add_edit?todoId=$id") }
+                        )
+                    }
                 }
             }
         }
